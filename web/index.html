@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PROTÓN virtual</title>
+<meta name="description" content="Modelo 3D interactivo de PROTÓN / Plague Bot VR: brazo de 6 GDL con las piezas CAD reales y chasis manejable.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<style>
+:root{--film:#E3E9E5;--sheet:#F4F7F4;--ink:#172024;--ink-2:#4C585E;--rule:#A7B3AE;--rule-2:#D3DBD7;--blue:#2240C2;--f:"Archivo","Arial Narrow","Helvetica Neue",Arial,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--film:#0E1215;--sheet:#151B1F;--ink:#DCE4E0;--ink-2:#98A5AB;--rule:#3B474D;--rule-2:#232C31;--blue:#8EA5FF;color-scheme:dark}}
+:root[data-theme="dark"]{--film:#0E1215;--sheet:#151B1F;--ink:#DCE4E0;--ink-2:#98A5AB;--rule:#3B474D;--rule-2:#232C31;--blue:#8EA5FF;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--film);color:var(--ink);font-family:var(--f);line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 36px}
+.wrap{max-width:1240px;margin:0 auto;display:grid;gap:14px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+h1{margin:0;font-size:clamp(1.5rem,3vw,2.2rem);font-stretch:112%;font-weight:760;line-height:1.1}
+p{margin:0;max-width:70ch;color:var(--ink-2)}
+a{color:inherit;text-decoration-color:var(--blue);text-underline-offset:3px}
+.lang{display:inline-flex;border:1px solid var(--ink)}
+.lang button{border:0;background:transparent;color:inherit;padding:3px 10px;font:inherit;font-weight:600;font-size:.8rem;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 id="t">PROTÓN virtual</h1>
+      <p id="d">Brazo de 6 GDL con las piezas CAD reales y chasis aproximado a partir de fotos. Mueve cada articulación, prueba las poses y maneja el robot.</p>
+    </div>
+    <div style="display:flex;gap:14px;align-items:center">
+      <a id="back" href="https://flkochu.github.io/">Volver al portafolio</a>
+      <span class="lang" role="group" aria-label="Idioma / Language"><button type="button" id="es" aria-pressed="true">ES</button><button type="button" id="en" aria-pressed="false">EN</button></span>
+    </div>
+  </header>
+  <div id="sim"></div>
+</div>
+<script type="module">
+import { mountProton } from "./sim.js";
+const TX = {
+  es: { t: "PROTÓN virtual", d: "Brazo de 6 GDL con las piezas CAD reales y chasis aproximado a partir de fotos. Mueve cada articulación, prueba las poses y maneja el robot.", back: "Volver al portafolio" },
+  en: { t: "Virtual PROTÓN", d: "6-DOF arm built from the real CAD parts and a chassis approximated from photos. Move each joint, try the poses and drive the robot.", back: "Back to portfolio" },
+};
+let lang = "es";
+try { lang = localStorage.getItem("all-lang") || ((navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en"); } catch (e) {}
+const sim = await mountProton(document.getElementById("sim"), { glb: "proton_arm.glb", poster: "poster.jpg", lang });
+function setLang(l) {
+  lang = l; document.documentElement.lang = l;
+  for (const k of ["t", "d", "back"]) document.getElementById(k).textContent = TX[l][k];
+  document.getElementById("es").setAttribute("aria-pressed", l === "es"); document.getElementById("en").setAttribute("aria-pressed", l === "en");
+  sim.setLang(l); try { localStorage.setItem("all-lang", l); } catch (e) {}
+}
+document.getElementById("es").onclick = () => setLang("es");
+document.getElementById("en").onclick = () => setLang("en");
+setLang(lang);
+window.__sim = sim;
+</script>
+</body>
+</html>
